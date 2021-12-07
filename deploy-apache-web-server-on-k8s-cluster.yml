@@ -1,0 +1,45 @@
+ apiVersion: v1
+kind: Namespace
+metadata:
+  name: httpd-namespace-datacenter
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpd-deployment-datacenter
+  namespace: httpd-namespace-datacenter
+  labels:
+    app: httpd
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: httpd
+  template:
+    metadata:
+      labels:
+        app: httpd
+    spec:
+      containers:
+      - name: httpd
+        image: httpd:latest
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: httpd-service-datacenter
+  namespace: httpd-namespace-datacenter
+  labels:
+    app: httpd
+spec:
+  type: NodePort
+  ports:
+  - nodePort: 30004
+    port: 80
+    targetPort: 80
+    protocol: TCP
+    name: http
+  selector:
+    app: httpd
